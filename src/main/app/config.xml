@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.8.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<http:listener-config name="payment-process-api-httpListenerConfig" protocol="HTTP"	host="0.0.0.0" port="${http.port}" doc:name="HTTP Listener Configuration" />
+	
+	<apikit:config name="payment-process-api-config" raml="payment-process-api.raml" consoleEnabled="false" doc:name="Router" />
+	
+	<http:request-config name="checking-account-system-api" protocol="HTTPS" host="${checking.account.system.api.host}" port="${checking.account.system.api.port}"
+		basePath="${checking.account.system.api.basePath}" doc:name="Checking account System API">
+		<http:raml-api-configuration location="account-system-api/api.raml" />
+	</http:request-config>
+	
+	
+	<http:request-config name="notification-system-api"	protocol="HTTP" host="${notifications.system.api.host}" port="${notifications.system.api.port}"
+		basePath="${notifications.system.api.basePath}" doc:name="Notifications System API">
+		<http:raml-api-configuration location="notifications-system-api/api.raml" />
+	</http:request-config>
+
+</mule>
