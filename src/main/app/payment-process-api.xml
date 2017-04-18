@@ -1,72 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" 
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
     
     <flow name="post:/accounts/{id}/transactions:application/json:payment-process-api-config">
-        <set-variable variableName="input" value="#[dw('payload')]" doc:name="save input"/>
         <http:request config-ref="checking-account-system-api" path="/accounts/{id}/transactions" method="POST" doc:name="Payment">
             <http:request-builder>
                 <http:uri-param paramName="id" value="#[flowVars.id]"/>
             </http:request-builder>
             <http:success-status-code-validator values="200,422"/>
         </http:request>
-        <dw:transform-message doc:name="save transactionOutcome">
-            <dw:set-variable variableName="transactionOutcome"><![CDATA[%dw 1.0
-%output application/java
----
-payload]]></dw:set-variable>
-        </dw:transform-message>
-        <flow-ref name="smsFlow" doc:name="smsFlow"/>
-        <dw:transform-message doc:name="transactionOutcome">
-            <dw:set-payload><![CDATA[%dw 1.0
-%output application/json
----
-flowVars.transactionOutcome]]></dw:set-payload>
-        </dw:transform-message>
-
     </flow>
-    <sub-flow name="smsFlow">
-        <http:request config-ref="checking-account-system-api" path="/accounts/{id}" method="GET" doc:name="Get owners">
-            <http:request-builder>
-                <http:uri-param paramName="id" value="#[flowVars.id]"/>
-            </http:request-builder>
-        </http:request>
-        <dw:transform-message doc:name="get owner IDs">
-            <dw:set-payload><![CDATA[%dw 1.0
-%output application/java
----
-payload.owners.user_id]]></dw:set-payload>
-        </dw:transform-message>
-        <foreach doc:name="For Each Owner">
-            <processor-chain doc:name="get phone number and send SMS">
-                <http:request config-ref="checking-account-system-api" path="/users/{id}" method="GET" doc:name="Get user number">
-                    <http:request-builder>
-                        <http:uri-param paramName="id" value="#[payload]"/>
-                    </http:request-builder>
-                </http:request>
-                <dw:transform-message doc:name="SMS notification">
-                    <dw:set-payload><![CDATA[%dw 1.0
-%output application/json
-%function first10chars(data) {
-	result: data[0..10] when (sizeOf data) > 10 otherwise data 
-}
----
-{
-	message: "Amount: " ++ flowVars.input.amount.amount ++ " " ++ flowVars.input.amount.currency ++
-			 ", trans: " ++ flowVars.transactionOutcome.transaction_id ++ ". Anypoint Bank.",
-	priority: "MINOR",
-	recipient: payload.phone,
-	subject: "Paid: " ++ first10chars(flowVars.input.description).result,
-	type: "SMS"
-}]]></dw:set-payload>
-                </dw:transform-message>
-                <logger message="#[message.payloadAs(java.lang.String)]" level="INFO" doc:name="Log Twilio request"/>
-                <http:request config-ref="notification-system-api" path="/notifications" method="POST" doc:name="Notifications API send SMS"/>
-            </processor-chain>
-        </foreach>
-    </sub-flow>
     
 </mule>

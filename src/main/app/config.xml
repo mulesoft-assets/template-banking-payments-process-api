@@ -21,11 +21,6 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 		<http:raml-api-configuration location="account-system-api/api.raml" />
 	</http:request-config>
 	
-	
-	<http:request-config name="notification-system-api"	protocol="HTTP" host="${notifications.system.api.host}" port="${notifications.system.api.port}"
-		basePath="${notifications.system.api.basePath}" doc:name="Notifications System API">
-		<http:raml-api-configuration location="notifications-system-api/api.raml" />
-	</http:request-config>
     <context:property-placeholder location="common.properties,mule.${mule.env}.properties"/>
 
 </mule>
