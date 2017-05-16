@@ -8,8 +8,6 @@ baseUri: https://mocksvc.mulesoft.com/mocks/5b0f1bed-d787-4bbe-ab59-34de20bf5b1b
 
 traits:
   transactionSearch: !include traits/transactionSearch.raml
-  accountSearch: !include traits/accountSearch.raml
-  userSearch: !include traits/userSearch.raml
       
 types: !include dataTypes.raml
  
@@ -17,7 +15,12 @@ types: !include dataTypes.raml
 /users:
   description: Info about all users
   get:
-    is: [userSearch]
+    queryParameters:
+      ssn:
+        description: SSN number of specific User
+	type: SSN
+	required: false
+	example: 078-05-1120
     responses:
         200:
           body:
@@ -58,7 +61,12 @@ types: !include dataTypes.raml
 
 /accounts:
   get:
-    is: [accountSearch]      
+    queryParameters:
+      ssn:
+        description: SSN number of specific User
+	type: SSN
+	required: false
+	example: 078-05-1120    
     responses:
       200:
         body:
