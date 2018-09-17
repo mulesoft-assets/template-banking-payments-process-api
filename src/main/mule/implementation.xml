@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    <flow name="implementationFlow" doc:id="3d5d0da6-5959-4c70-be4f-0dea2b43ef84">
+        <http:request method="POST" doc:name="Request"
+            doc:id="fe7a2088-9931-413c-bda9-7c465011b85d" config-ref="HTTP_Identity_Service_Request_Configuration"
+            path="/accounts/{id}/transactions">
+			<http:uri-params ><![CDATA[#[output applicaton/java
+---
+{
+	"id" : attributes.uriParams.id
+}]]]></http:uri-params>
+        </http:request>
+    </flow>
+</mule>
