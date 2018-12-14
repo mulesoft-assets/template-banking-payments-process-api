@@ -4,30 +4,42 @@ version: v2.0
 baseUri: http://localhost:8081/api
 
 uses: 
-  common: /exchange_modules/4d302cca-3f9a-4257-8ce4-20cf81a72e47/banking_common/1.0.0/banking_common.raml
+  common: exchange_modules/org.mule.templates/banking-common/1.0.1/banking_common.raml
 
 types:
   PaymentRequest:
+    type: object
     properties:
-      amount: common.Money
-      label: string
-      receiver_IBAN: string
-      description: string
+      amount: 
+        type: common.Money
+        description: amount 
+      label: 
+        type: string
+        description: name of payment 
+      receiver_IBAN: 
+        type: string
+        description: receiver IBAN
+      description: 
+        type: string
+        description: notes for receiver
 
   PaymentStatus:
+    type: object
     properties:
-      transaction_id: string
-      status: 
+      transaction_id: 
+        type: string
+        description: identifier of transaction
+      status:
+        type: string 
         enum: [accepted, rejected]
-      additional_info?: string
+        description: payment status 
+      additional_info?: 
+        type: string
+        description: additional information
 
 /accounts/{id}/transactions:
-  uriParameters:
-    id: 
-      description: Account id
-    
- 
   post:
+    displayName: Create payment
     description: Use to make a new payment.
     body: 
       application/json:
